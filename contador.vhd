@@ -3,9 +3,10 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity contador is
 port (	
-			 clk, switch0, switch1 :     in std_logic;
-          reset:      in std_logic;
-          counter, sinais : out std_logic_vector(5 downto 0)
+			 clk, switch0, switch1   : in std_logic;
+          botaoinicio, botaofinal :	in std_logic;
+			 reset						 : in std_logic;
+          counter, sinais 			 : out std_logic_vector(5 downto 0)
 );
 end contador;
 
@@ -15,7 +16,7 @@ architecture semaforo of contador is
 				clk:     in std_logic;
 				J, K:    in std_logic;
 			   Q, Qbar: out std_logic;
-				reset:   in std_logic
+				reset:    std_logic
 				);
 	end component;
 	
@@ -30,6 +31,9 @@ signal J3,J4,J5,J6,Q1,Q2,Q3,Q4,Q5,Q6,Qbar1,Qbar2,Qbar3,Qbar4, Qbar5, Qbar6 : std
 signal acaiverde, acaiamarelo, acaivermelho, guaranaverde, guaranamarelo, guaranavermelho : std_logic;
 signal sita, sitb, sitc, clock_alterado : std_logic;
 
+signal contadorvelocidade : integer;
+signal fimcontagem : std_logic;
+
 begin 
 	J3 <= Q1 and Q2;
 	J4<= J3 and Q3;
@@ -38,12 +42,16 @@ begin
 
 	DVF00: DivisorFrequencia port map(clk, clock_alterado);
 	
-	FF1 : flipflopJK port map (clock_alterado,'1','1',Q1,Qbar1,reset);
-	FF2 : flipflopJK port map (clock_alterado, Q1,Q1,Q2,Qbar2,reset);
-	FF3 : flipflopJK port map (clock_alterado, J3,J3,Q3,Qbar3,reset);
-	FF4 : flipflopJK port map (clock_alterado, J4,J4,Q4,Qbar4,reset);
-	FF5 : flipflopJK port map (clock_alterado, J5,J5,Q5,Qbar5,reset);
-	FF6 : flipflopJK port map (clock_alterado, J6,J6,Q6,Qbar6,reset);
+	fimcontagem <= Q6 and (not Q5) and Q4 and Q3 and Q2 and not Q1;
+	
+	FF1 : flipflopJK port map (clock_alterado,'1','1',Q1,Qbar1,fimcontagem);
+	FF2 : flipflopJK port map (clock_alterado, Q1,Q1,Q2,Qbar2,fimcontagem);
+	FF3 : flipflopJK port map (clock_alterado, J3,J3,Q3,Qbar3,fimcontagem);
+	FF4 : flipflopJK port map (clock_alterado, J4,J4,Q4,Qbar4,fimcontagem);
+	FF5 : flipflopJK port map (clock_alterado, J5,J5,Q5,Qbar5,fimcontagem);
+	FF6 : flipflopJK port map (clock_alterado, J6,J6,Q6,Qbar6,fimcontagem);
+	
+	-- y = AB'CDEF'
 	
 	sita <= not switch0 and not switch1;
 	sitb <= not switch0 and switch1;
@@ -92,8 +100,7 @@ begin
 			and sitb)
 			or
 			('0' and sitc);
-		
-  
+	
    guaranaverde <= 
 	 -- y = A'BC + AB'C' + AB'D'E' + AB'D'F' + A'BDEF (23 a 42)
 	 ((
@@ -116,17 +123,22 @@ begin
 		-- y = AB'CDE' + AB'CD'EF (43 a 45)
 	  (((Q6 and not Q5 and Q4 and Q3 and not Q2) or (Q6 and not Q5 and Q4 and not Q3 and Q2 and Q1)) and sitb) or (not Q1 and sitc);
 	  
-	  guaranavermelho <= acaiverde or (acaiamarelo and (sitb or sita)) or (sitc and '0');
+   guaranavermelho <= acaiverde or (acaiamarelo and (sitb or sita)) or (sitc and '0');
   
---  --situação C:
---  ave <= '0';
---  aam <= not Q1;
---  avo <= '0';
---  gve <= '0';
---  gam <= not Q1;
---  gvo <= '0';
 	sinais <= acaiverde & acaiamarelo & acaivermelho & guaranaverde & guaranamarelo & guaranavermelho; 
 	counter <= Q6 & Q5 & Q4 & Q3 & Q2 & Q1;
-
-
+	
+--	process (botaoinicio, contadorvelocidade)
+--		begin
+--		if (botaoinicio='1' and botaoinicio'EVENT) then
+--			contadorvelocidade = contadorvelocidade + 1;
+--			
+--			if(contadorvelocidade >= 3) then
+--				multa <= '1';
+--			end if;
+--		else
+--			
+--		end if;
+--	end process;
+	
 end semaforo;
