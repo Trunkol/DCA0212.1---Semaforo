@@ -60,14 +60,18 @@ begin
 		-- y = A'B' + A'C'D' (0 a 19)
 		(((not Q6 and not Q5) or (not(Q6) and not Q4 and not Q3)) and sita) or 
 		--  y = A'B' + A'C' + A'D' + A'E' (0 a 29)
-		(((not Q6 and not Q5) or (not Q6 and not Q4) or (not Q6 and not Q3) or (not Q6 and not Q2)) and sitb);
+		(((not Q6 and not Q5) or (not Q6 and not Q4) or (not Q6 and not Q3) or (not Q6 and not Q2)) and sitb) or
+		-- Verde apagado
+		('0' and sitc);
 	 
 	acaiamarelo <= 
 		-- y = A'BC'DE' + A'BC'DF' (20 a 22)
 		(((not Q6 and Q5 and not Q4 and Q3 and not Q2) or (not Q6 and Q5 and not Q4 and Q3 and not Q1)) and sita) or
 		-- y = A'BCDE + AB'C'D'E'F' (30 a 32)
-		(((not Q6 and Q5 and Q4 and Q3 and Q2) or (Q6 and not Q5 and not Q4 and not Q3 and not Q2 and not Q1)) and sitb);
- 
+		(((not Q6 and Q5 and Q4 and Q3 and Q2) or (Q6 and not Q5 and not Q4 and not Q3 and not Q2 and not Q1)) and sitb) or
+		-- Amarelo piscando
+		(not Q1 and sitc);
+		
 
 	acaivermelho <= 
 		-- y = A'BC + AB'C' + AB'D' + AB'E' + AB'F' + A'BDEF (23 a 45)
@@ -85,7 +89,9 @@ begin
 			(Q6 and not Q5 and not Q4 and Q2) or 
 			(Q6 and not Q5 and Q3 and not Q2) or 
 			(Q6 and not Q5 and Q4 and not Q3)) 
-			and sitb);
+			and sitb)
+			or
+			('0' and sitc);
 		
   
    guaranaverde <= 
@@ -100,15 +106,17 @@ begin
 	 (((Q6 and not Q5 and not Q4 and Q1) or 
 		(Q6 and not Q5 and not Q4 and Q3) or 
 		(Q6 and not Q5 and not Q3 and Q2 and not Q1) or 
-		(Q6 and not Q5 and Q4 and not Q3 and not Q2)) and sitb);
+		(Q6 and not Q5 and Q4 and not Q3 and not Q2)) and sitb)
+		or
+		('0' and sitc);
 
 	  guaranamarelo <= 
 	  -- y = AB'CDE' + AB'CD'EF (43 a 45)
 	  (((Q6 and not Q5 and Q4 and Q3 and not Q2) or (Q6 and not Q5 and Q4 and not Q3 and Q2 and Q1)) and sita)  or
 		-- y = AB'CDE' + AB'CD'EF (43 a 45)
-	  (((Q6 and not Q5 and Q4 and Q3 and not Q2) or (Q6 and not Q5 and Q4 and not Q3 and Q2 and Q1)) and sitb);
+	  (((Q6 and not Q5 and Q4 and Q3 and not Q2) or (Q6 and not Q5 and Q4 and not Q3 and Q2 and Q1)) and sitb) or (not Q1 and sitc);
 	  
-	  guaranavermelho <= acaiverde or acaiamarelo;
+	  guaranavermelho <= acaiverde or (acaiamarelo and (sitb or sita)) or (sitc and '0');
   
 --  --situação C:
 --  ave <= '0';

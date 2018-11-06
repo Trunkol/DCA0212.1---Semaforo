@@ -15,7 +15,7 @@ begin
 	begin
 		if(clock_in='1' and clock_in'EVENT) then
 			-- necessario configurar para o clock desejado
-			if contagem=2 then
+			if contagem=1 then
 				estado <= not estado;
 				contagem <= 1;
 			else
