@@ -2,7 +2,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 USE ieee.numeric_std.ALL;
 
-entity contador is
+entity projeto2 is
 port (	
 			 clk, switch0, switch1   : in std_logic;
           botaoinicio, botaofinal :	in std_logic;
@@ -10,9 +10,9 @@ port (
 			 multa						 : out std_logic;
           counter, sinais 			 : out std_logic_vector(5 downto 0)
 );
-end contador;
+end projeto2;
 
-architecture semaforo of contador is
+architecture semaforo of projeto2 is
 	component flipflopJK is
 		port ( 
 				clk:     in std_logic;
@@ -38,7 +38,7 @@ signal velocidadearmazenada, contadorvelocidade : std_logic_vector(5 downto 0);
 begin 
 	contadorvelocidade <= Q6 & Q5 & Q4 & Q3 & Q2 & Q1;
 
-	process (botaoinicio, velocidadearmazenada, contadorvelocidade)
+	process (botaoinicio, botaofinal, velocidadearmazenada, contadorvelocidade)
 	begin
 		if(botaoinicio = '1') then
 			multa <= '0';
@@ -46,7 +46,7 @@ begin
 		end if;
 
 		if(botaofinal = '1') then
-			if(to_integer(unsigned(contadorvelocidade)) - (to_integer(unsigned(velocidadearmazenada))) > 3) then
+			if(to_integer(unsigned(contadorvelocidade)) - (to_integer(unsigned(velocidadearmazenada))) < 3) then
 				multa <= '1';
 			else
 				multa <= '0';
